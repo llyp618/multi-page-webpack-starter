@@ -1,0 +1,2 @@
+require('@/css/pageA.css')
+

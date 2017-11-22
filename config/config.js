@@ -1,9 +1,9 @@
+
 module.exports = {
 	HTMLDirs: [
-		"index"
+		"index",
+		"pageA"
 	],
-	cssPublicPath:"../",
 	imgOutputPath:"img/",
-	cssOutputPath:"./css/styles.css",
 	devServerOutputPath:"../dist"
 }

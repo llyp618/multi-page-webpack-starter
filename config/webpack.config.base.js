@@ -1,8 +1,6 @@
 const path = require("path")
 // 引入插件
 const HTMLWebpackPlugin = require("html-webpack-plugin")
-// 清理dist文件夹
-const CleanWebpackPlugin = require("clean-webpack-plugin")
 // 抽取css
 const ExtractTextPlugin = require("extract-text-webpack-plugin")
 // 引入多页面文件列表
@@ -16,8 +14,9 @@ let Entries = {}
 config.HTMLDirs.forEach((page) => {
 	const htmlPlugin = new HTMLWebpackPlugin({
 		filename: `${page}.html`,
-		template: path.resolve(__dirname, `../app/html/${page}.html`),
-		chunks: [page, 'commons']
+		template: 'html-withimg-loader!' + path.resolve(__dirname, `../app/html/${page}.html`),
+		chunks: [page, 'commons'],
+		minify: false
 	})
 	HTMLPlugins.push(htmlPlugin)
 	Entries[page] = path.resolve(__dirname, `../app/js/${page}.js`)
@@ -27,7 +26,8 @@ module.exports = {
 	entry: Entries,
 	devtool: "cheap-module-source-map",
 	output:{
-		filename:"js/[name].bundle.[hash].js"
+		filename:"js/[name].bundle.[hash].js",
+		path:path.resolve(__dirname, '../dist')
 	},
 	// 加载器
 	module: {
@@ -38,7 +38,6 @@ module.exports = {
 				exclude: /node_modules/,
 				use: ExtractTextPlugin.extract({
 					fallback: "style-loader",
-					publicPath: config.cssPublicPath,
 					use: [
 						{
 							loader: "css-loader",
@@ -80,11 +79,17 @@ module.exports = {
 			}
 		]
 	},
+	resolve: {
+		alias:{
+			'@': path.resolve(__dirname, '../app')
+		}
+	},
 	plugins: [
-		// 自动清理 dist
-		new CleanWebpackPlugin(["dist"]),
 		// css抽取
-		new ExtractTextPlugin(config.cssPublicPath),
+		new ExtractTextPlugin({
+			filename: 'css/[name].css',
+      allChunks: true,
+		}),
 		// 自动生成HTML插件
 		...HTMLPlugins
 	]
